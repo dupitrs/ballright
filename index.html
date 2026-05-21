@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b5cad">
+<title>Eksāmenu gatavošanās</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="locked">
+<div id="lockScreen" class="lock-screen">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-icon">🔒</div>
+    <h1 class="lock-title">Eksāmenu gatavošanās</h1>
+    <p class="lock-subtitle">Ievadi paroli, lai turpinātu</p>
+    <form id="lockForm" autocomplete="off">
+      <input type="password" id="lockPassword" class="lock-input" placeholder="Parole" required>
+      <div class="lock-error" id="lockError" aria-live="polite"></div>
+      <button type="submit" class="lock-btn">Ieiet →</button>
+    </form>
+  </div>
+  <div class="lock-goodboy" id="lockGoodboy" hidden>
+    <div class="goodboy-emoji">🐶</div>
+    <div class="goodboy-text">good boy</div>
+    <div class="confetti" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <button class="back-btn" id="backBtn" hidden aria-label="Atpakaļ uz sākumu">←</button>
+  <div class="brand">
+    <h1 id="brandTitle">Eksāmenu gatavošanās</h1>
+    <p id="brandSubtitle" class="subtitle">Izvēlies testu, lai sāktu</p>
+  </div>
+</header>
+
+<main id="app">
+  <!-- screens injected by JS -->
+</main>
+
+<footer class="footer">
+  <span>Made by airis</span>
+</footer>
+
+<script src="data/questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
