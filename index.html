@@ -42,9 +42,12 @@
 
 <header class="topbar">
   <button class="back-btn" id="backBtn" hidden aria-label="Atpakaļ uz sākumu">←</button>
-  <button class="theme-toggle" id="themeToggle" aria-label="Pārslēgt tēmu" title="Pārslēgt tēmu">
-    <span class="theme-icon-sun" aria-hidden="true">☀</span>
-    <span class="theme-icon-moon" aria-hidden="true">☾</span>
+  <button type="button" class="theme-switch" id="themeToggle" role="switch" aria-checked="false" aria-label="Pārslēgt tumšo tēmu" title="Pārslēgt tēmu">
+    <span class="theme-switch-track">
+      <span class="theme-switch-icon sun" aria-hidden="true">☀</span>
+      <span class="theme-switch-icon moon" aria-hidden="true">☾</span>
+      <span class="theme-switch-thumb"></span>
+    </span>
   </button>
   <div class="brand">
     <h1 id="brandTitle">Eksāmenu gatavošanās</h1>

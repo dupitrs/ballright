@@ -41,32 +41,70 @@
   --modal-bg: #1a212e;
 }
 
-/* ===== THEME TOGGLE ===== */
-.theme-toggle {
+/* ===== THEME SWITCH ===== */
+.theme-switch {
   position: absolute;
-  top: calc(env(safe-area-inset-top) + 8px);
-  right: 8px;
-  background: rgba(255, 255, 255, 0.15);
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: 12px;
+  width: 56px;
+  height: 30px;
+  padding: 0;
   border: 0;
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  font-size: 18px;
+  background: transparent;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, transform 0.05s;
   z-index: 5;
+  -webkit-tap-highlight-color: transparent;
 }
-.theme-toggle:hover { background: rgba(255, 255, 255, 0.25); }
-.theme-toggle:active { transform: translateY(1px); }
-.theme-toggle .theme-icon-sun,
-.theme-toggle .theme-icon-moon { line-height: 1; }
-:root[data-theme="dark"] .theme-toggle .theme-icon-moon { display: none; }
-:root:not([data-theme="dark"]) .theme-toggle .theme-icon-sun { display: none; }
-.topbar:has(#themeToggle:not([hidden])) .brand { padding-right: 56px; }
+.theme-switch-track {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: background 0.2s;
+}
+.theme-switch:hover .theme-switch-track { background: rgba(0, 0, 0, 0.38); }
+.theme-switch-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
+  pointer-events: none;
+  z-index: 1;
+}
+.theme-switch-icon.sun { left: 7px; }
+.theme-switch-icon.moon { right: 7px; }
+.theme-switch-thumb {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translate(0, -50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.22s cubic-bezier(.34,1.4,.64,1), background 0.2s;
+  z-index: 2;
+}
+:root[data-theme="dark"] .theme-switch-thumb {
+  transform: translate(26px, -50%);
+  background: #f0f4ff;
+}
+:root[data-theme="dark"] .theme-switch-track {
+  background: rgba(77, 158, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.theme-switch:focus-visible .theme-switch-track {
+  outline: 2px solid #ffbf47;
+  outline-offset: 2px;
+}
+.topbar .brand { padding-right: 72px; }
 
 /* ===== LOCK SCREEN ===== */
 body.locked { overflow: hidden; }

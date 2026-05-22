@@ -2,14 +2,16 @@
 (function () {
   'use strict';
 
-  /* ===== THEME TOGGLE ===== */
-  (function themeToggle() {
+  /* ===== THEME SWITCH ===== */
+  (function themeSwitch() {
     const THEME_KEY = 'theme_v1';
     const btn = document.getElementById('themeToggle');
     if (!btn) return;
     const apply = (theme) => {
       document.documentElement.setAttribute('data-theme', theme);
-      btn.setAttribute('aria-label', theme === 'dark' ? 'Ieslēgt gaišo tēmu' : 'Ieslēgt tumšo tēmu');
+      const isDark = theme === 'dark';
+      btn.setAttribute('aria-checked', String(isDark));
+      btn.setAttribute('aria-label', isDark ? 'Ieslēgt gaišo tēmu' : 'Ieslēgt tumšo tēmu');
     };
     apply(document.documentElement.getAttribute('data-theme') || 'light');
     btn.addEventListener('click', () => {
