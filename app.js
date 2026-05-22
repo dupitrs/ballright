@@ -2,6 +2,24 @@
 (function () {
   'use strict';
 
+  /* ===== THEME TOGGLE ===== */
+  (function themeToggle() {
+    const THEME_KEY = 'theme_v1';
+    const btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    const apply = (theme) => {
+      document.documentElement.setAttribute('data-theme', theme);
+      btn.setAttribute('aria-label', theme === 'dark' ? 'Ieslēgt gaišo tēmu' : 'Ieslēgt tumšo tēmu');
+    };
+    apply(document.documentElement.getAttribute('data-theme') || 'light');
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      apply(next);
+      try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+    });
+  })();
+
   /* ===== PASSWORD GATE ===== */
   const LOCK_KEY = 'site_unlocked_v1';
   const LOCK_PASSWORD = 'raivispapucis';

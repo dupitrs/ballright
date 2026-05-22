@@ -6,6 +6,16 @@
 <meta name="theme-color" content="#0b5cad">
 <title>Eksāmenu gatavošanās</title>
 <link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('theme_v1');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (_) {}
+  })();
+</script>
 </head>
 <body class="locked">
 <div id="lockScreen" class="lock-screen">
@@ -32,6 +42,10 @@
 
 <header class="topbar">
   <button class="back-btn" id="backBtn" hidden aria-label="Atpakaļ uz sākumu">←</button>
+  <button class="theme-toggle" id="themeToggle" aria-label="Pārslēgt tēmu" title="Pārslēgt tēmu">
+    <span class="theme-icon-sun" aria-hidden="true">☀</span>
+    <span class="theme-icon-moon" aria-hidden="true">☾</span>
+  </button>
   <div class="brand">
     <h1 id="brandTitle">Eksāmenu gatavošanās</h1>
     <p id="brandSubtitle" class="subtitle">Izvēlies testu, lai sāktu</p>
