@@ -129,6 +129,16 @@
     return a;
   }
 
+  function getOptionOrder(state, qKey, question) {
+    if (!state.optionOrders) state.optionOrders = {};
+    if (!state.optionOrders[qKey]) {
+      const original = LETTERS.filter((l) => question.options[l] !== undefined);
+      state.optionOrders[qKey] = shuffle(original);
+      saveState(state.slug, state);
+    }
+    return state.optionOrders[qKey];
+  }
+
   function getTest(slug) {
     return TESTS.find((t) => t.slug === slug);
   }
@@ -204,6 +214,7 @@
         order,
         idx: 0,
         answers: {}, // questionIndex -> 'a'|'b'|... (user's choice)
+        optionOrders: {},
         startedAt: Date.now(),
       };
       saveState(slug, state);
@@ -224,6 +235,7 @@
         slug: EXAM,
         order,
         answers: {}, // posIndex -> letter
+        optionOrders: {},
         currentPage: 0,
         submitted: false,
         submittedAt: null,
@@ -249,6 +261,7 @@
         order: buildDoomOrder(),
         idx: 0,
         answers: {}, // positionInOrder -> letter (per round)
+        optionOrders: {},
         round: 1,
         totalCorrect: 0,
         totalAnswered: 0,
@@ -463,6 +476,7 @@
       runtime.order = buildDoomOrder();
       runtime.idx = 0;
       runtime.answers = {};
+      runtime.optionOrders = {};
       runtime.showRoundToast = true;
       saveState(DOOM, runtime);
     }
@@ -485,7 +499,7 @@
     const progressPct = total ? Math.round((done / total) * 100) : 0;
     const userAnswer = runtime.answers[qKey];
 
-    const orderedLetters = LETTERS.filter((l) => question.options[l] !== undefined);
+    const orderedLetters = getOptionOrder(runtime, qKey, question);
 
     let topBar;
     if (isDoom) {
@@ -519,9 +533,9 @@
       <article class="question-card">
         <h2 class="question-text">${escapeHtml(question.text)}</h2>
         <div class="options" id="options">
-          ${orderedLetters.map((letter) => `
+          ${orderedLetters.map((letter, posIdx) => `
             <button type="button" class="option" data-letter="${letter}">
-              <span class="letter">${letter.toUpperCase()}</span>
+              <span class="letter">${LETTERS[posIdx].toUpperCase()}</span>
               <span class="label">${escapeHtml(question.options[letter])}</span>
             </button>
           `).join('')}
@@ -560,7 +574,9 @@
       } else {
         feedbackEl.className = 'feedback show bad';
         const corrText = question.options[correct] || '';
-        feedbackEl.innerHTML = `Nepareizi. Pareizā atbilde: <strong>${correct.toUpperCase()}.</strong> ${escapeHtml(corrText)}`;
+        const correctPos = orderedLetters.indexOf(correct);
+        const correctVisual = correctPos >= 0 ? LETTERS[correctPos].toUpperCase() : correct.toUpperCase();
+        feedbackEl.innerHTML = `Nepareizi. Pareizā atbilde: <strong>${correctVisual}.</strong> ${escapeHtml(corrText)}`;
       }
       nextBtn.hidden = false;
       nextBtn.focus();
@@ -618,7 +634,7 @@
     const item = runtime.order[pos];
     const question = getQuestionAt(EXAM, item);
     if (!question) { goHome(); return; }
-    const letters = LETTERS.filter((l) => question.options[l] !== undefined);
+    const letters = getOptionOrder(runtime, pos, question);
     const userAnswer = runtime.answers[pos];
     const stateLabel = userAnswer ? 'Atbildēts' : 'Nav vēl atbildēts';
     const stateClass = userAnswer ? 'answersaved' : 'notyetanswered';
@@ -646,7 +662,7 @@
                     <div class="${i % 2 === 0 ? 'r0' : 'r1'}" data-letter="${letter}">
                       <input type="radio" name="examAnswer" value="${letter}" id="examAns-${letter}" ${userAnswer === letter ? 'checked' : ''}>
                       <label for="examAns-${letter}" class="ans-label">
-                        <span class="answernumber">${letter}. </span>
+                        <span class="answernumber">${LETTERS[i]}. </span>
                         <span class="ans-text">${escapeHtml(question.options[letter])}</span>
                       </label>
                     </div>
@@ -784,8 +800,14 @@
     const rows = r.perQuestion.map((p, i) => {
       const t = getTest(p.testSlug);
       const q = t ? t.questions[p.qIdx] : null;
-      const userLetter = p.userAnswer ? p.userAnswer.toUpperCase() : '—';
-      const correctLetter = p.correctAnswer ? p.correctAnswer.toUpperCase() : '—';
+      const displayOrder = (runtime.optionOrders && runtime.optionOrders[i])
+        || (q ? LETTERS.filter((l) => q.options[l] !== undefined) : []);
+      const visualOf = (orig) => {
+        const pos = displayOrder.indexOf(orig);
+        return pos >= 0 ? LETTERS[pos].toUpperCase() : (orig ? orig.toUpperCase() : '—');
+      };
+      const userLetter = p.userAnswer ? visualOf(p.userAnswer) : '—';
+      const correctLetter = p.correctAnswer ? visualOf(p.correctAnswer) : '—';
       const sourceTitle = t ? t.title : '';
       const userText = q && p.userAnswer ? escapeHtml(q.options[p.userAnswer] || '') : '<em>Nav atbildēts</em>';
       const correctText = q ? escapeHtml(q.options[p.correctAnswer] || '') : '';
@@ -858,7 +880,8 @@
       const q = test.questions[qIdx];
       const user = runtime.answers[qIdx];
       const isCorrect = user === q.correct;
-      const letters = LETTERS.filter((l) => q.options[l] !== undefined);
+      const letters = (runtime.optionOrders && runtime.optionOrders[qIdx])
+        || LETTERS.filter((l) => q.options[l] !== undefined);
       return `
         <div class="overview-item ${isCorrect ? '' : 'wrong'}">
           <p class="q">
@@ -866,7 +889,7 @@
             <span>${escapeHtml(q.text)}</span>
           </p>
           <ul>
-            ${letters.map((l) => {
+            ${letters.map((l, posIdx) => {
               const isUser = user === l;
               const isAnswer = q.correct === l;
               let cls = '';
@@ -874,7 +897,7 @@
               if (isAnswer && isUser) { cls = 'you-correct'; tag = '<span class="tag">tava + pareiza</span>'; }
               else if (isAnswer) { cls = 'right-answer'; tag = '<span class="tag">pareizā</span>'; }
               else if (isUser) { cls = 'you-wrong'; tag = '<span class="tag">tava</span>'; }
-              return `<li class="${cls}"><span class="ol">${l.toUpperCase()}.</span><span>${escapeHtml(q.options[l])}</span>${tag}</li>`;
+              return `<li class="${cls}"><span class="ol">${LETTERS[posIdx].toUpperCase()}.</span><span>${escapeHtml(q.options[l])}</span>${tag}</li>`;
             }).join('')}
           </ul>
         </div>
